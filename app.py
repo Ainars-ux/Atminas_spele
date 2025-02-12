@@ -1,4 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
+import json 
+from datubaze import get_top_results, pievienot
 
 app = Flask(__name__)
 
@@ -21,6 +23,29 @@ def top():
 @app.route('/about')
 def about():
     return render_template("about.html")
+
+
+@app.route('/topData', methods=['GET'])
+def top_data():
+    try:
+        top_rezultati = get_top_results
+        top_5 = sorted(top_rezultati, key=lambda x: (x['kliksi'], x['laiks']))[:5]
+        return jsonify(top_5), 200
+    except Exception:
+        return jsonify({'status' : 'error'})
+    
+@app.route('/pievienot-rezultatu', methods=['POST'])
+def pievienot-rezultatu():
+    dati = request.json 
+    try:
+    pievienot(dati)
+    top_5 = sorted(get_top_results(), key=lambda x: (x['kliksi'], x['laiks']))[:5] 
+    with open('result.json', 'w', encoding='utf-8') as fail:
+        json.dump (top_5, fail, ensure_ascii=False, indent=4)
+    return jsonify({status : 'sucess'}), 200
+except Exception:
+    return jsonify({status : 'error'}), 500
+
 
 if __name__ == '__main__':
   #app.run(host='0.0.0.0', port=80)
